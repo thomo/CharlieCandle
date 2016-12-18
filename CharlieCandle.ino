@@ -26,6 +26,8 @@ uint8_t        page = 0;    // Front/back buffer control
 const uint8_t *ptr  = anim; // Current pointer into animation data
 uint8_t        img[9 * 16]; // Buffer for rendering image
 
+#define UPSIDE_DOWN         // uncomment to rotate flame
+
 // UTILITY FUNCTIONS -------------------------------------------------------
 
 // The full IS31FL3731 library is NOT used by this code.  Instead, 'raw'
@@ -138,7 +140,11 @@ void loop() {
   uint8_t i = 0, byteCounter = 1;
   for(uint8_t x=0; x<9; x++) {
     for(uint8_t y=0; y<16; y++) {
+#ifdef UPSIDE_DOWN
+      Wire.write(img[(9*16-1)-i++]);      // Write each byte to matrix
+#else
       Wire.write(img[i++]);      // Write each byte to matrix
+#endif
       if(++byteCounter >= 32) {  // Every 32 bytes...
         Wire.endTransmission();  // end transmission and
         writeRegister(0x24 + i); // start a new one (Wire lib limits)
